@@ -120,9 +120,27 @@ const TrackerTable = () => {
 
 
   const getPrevoiusWeek = () => {
+    
+    const prevWeekDate = new Date(date);
+    const days = 7
+    prevWeekDate.setDate(prevWeekDate.getDate() - days)
+    console.log('>> prevWeekDate', prevWeekDate)
+
+    const stringDate = prevWeekDate.toISOString().slice(0, 10)
+    setDate(stringDate)
+
   }
 
   const getNextWeek = () => {
+    
+    const nextWeekDate = new Date(date);
+    const days = 7
+    nextWeekDate.setDate(nextWeekDate.getDate() + days)
+    console.log('>> nextWeekDate', nextWeekDate)
+
+    const stringDate = nextWeekDate.toISOString().slice(0, 10)
+    setDate(stringDate)
+
   }
 
   
@@ -137,7 +155,7 @@ const TrackerTable = () => {
             
             <div>
                 <button
-                    onChange={getPrevoiusWeek} 
+                    onClick={getPrevoiusWeek} 
                     className='bg-blue-500 hover:bg-blue-700 font-bold text-white py-2 px-4 rounded'>
                     <FaChevronLeft/>
                 </button>
@@ -148,7 +166,7 @@ const TrackerTable = () => {
             <div>
              
                 <button 
-                  onChange={getNextWeek}
+                  onClick={getNextWeek}
                   className='bg-blue-500 hover:bg-blue-700 font-bold text-white py-2 px-4 rounded'>
                     <FaChevronRight/>
                 </button>
