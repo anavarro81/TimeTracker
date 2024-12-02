@@ -1,7 +1,7 @@
 
-const getFirstDayOfWeek = (currentDate) => {   
+export const getFirstDayOfWeek = (currentDate) => {   
        // Obtener la fecha actual
-   console.log('>> currentDate : ', currentDate)
+   
    // Obtengo el día actual de la semana. 0 es Domingo, 1 es Lunes, 2 es Martes, etc.
    const currentDay = currentDate.getDay()
    // Si el día actual es Domingo, le resto 6 días para obtener el Lunes de la semana actual
@@ -16,9 +16,10 @@ const getFirstDayOfWeek = (currentDate) => {
    
 }
 // Crear toda la emana a partir del lunes
-const getCurrentWeek = (date) => {
-
+export const getCurrentWeek = (date) => {
     
+    console.log('>> getCurrentWeek ')
+
     const firtsDay = getFirstDayOfWeek(date)
     const curretWeek = []
     curretWeek.push(firtsDay)
@@ -27,15 +28,48 @@ const getCurrentWeek = (date) => {
     for (let index = 1; index < 7; index++) {
 
         const dayofWeek = new Date(firtsDay)
-        dayofWeek.setDate(dayofWeek.getDate() + index)
-
-        console.log('dayofWeek : ', dayofWeek);
-        curretWeek.push(dayofWeek)
-
-        
+        dayofWeek.setDate(dayofWeek.getDate() + index)       
+        curretWeek.push(dayofWeek)        
     }
-    console.log(curretWeek);
     
+    return curretWeek  
 }
 
-export default getCurrentWeek
+export const convertMinutestoTime = (totalminutes) => {
+    const hours = Math.floor(totalminutes / 60);
+    const minutes = totalminutes % 60;
+  
+    const hoursString = hours.toString().padStart(2, "0");
+    const minutesString = minutes.toString().padStart(2, "0");
+  
+    const totalHours = `${hoursString} : ${minutesString}`;
+
+    return totalHours;
+  
+    
+  };
+
+  // Calcular la duración restantando la hora de fin de la de inicio
+export const calculateDuration = (start, end) => {
+    const startMinutes = convertTimetoMinutes(start);
+    const endMinutes = convertTimetoMinutes(end);
+  
+    console.log("startMinutes :", startMinutes);
+    console.log("endMinutes :", endMinutes);
+  
+    const totalMinutes = endMinutes - startMinutes;
+  
+    console.log("totalMinutes: ", totalMinutes);
+  
+    return convertMinutestoTime(totalMinutes);
+  };
+
+  export const convertTimetoMinutes = (time) => {
+    
+    const [hours, minutes] = time.split(":");  
+    const hoursInMinutes = parseInt(hours) * 60;  
+    const totalMinutes = hoursInMinutes + parseInt(minutes);     
+    return totalMinutes;
+  };
+
+export default calculateDuration;
