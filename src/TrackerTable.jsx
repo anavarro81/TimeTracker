@@ -1,7 +1,7 @@
 
 import React, {useEffect, useState, useRef} from 'react'
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
-import {calculateDuration, getCurrentWeek} from './utils/dates'
+import {calculateDuration, getCurrentWeek, convertTimetoMinutes} from './utils/dates'
 
 const TrackerTable = () => {
   
@@ -40,19 +40,17 @@ const TrackerTable = () => {
 
   const setDeliveryTime = (e, index) => {    
 
+    console.log('>> setDeliveryTime')
+
     // Se crea una copia del array de timeTable
     const updatedTimeTable = [...timeTable]
-
-    console.log('>> setDeliveryTime')
-    console.log('>> updatedTimeTable', updatedTimeTable)
-    console.log('>> currentWeek[index]', currentWeek[index])
     
-    const exist = updatedTimeTable.find((day) => day.day === currentWeek[index])          
-    
-    
-    console.log('>> exist :', exist )
+    const exist = updatedTimeTable.find((day) => day.day === currentWeek[index])              
     
     exist.deliveryTime = e.target.value      
+
+    console.log('exist.pickUpTime > ', exist.pickUpTime)
+    console.log('exist.deliveryTime > ', exist.deliveryTime)
 
     if (exist.pickUpTime > "00:00" && exist.deliveryTime > "00:00") {        
       const totalhours = calculateDuration(exist.pickUpTime, exist.deliveryTime)
@@ -62,8 +60,33 @@ const TrackerTable = () => {
       
     }
   }
-  
 
+  
+  // Valida que la hora de entrega no sea menor a la de recogida
+  const onBlurDeliveryTime = (e, index) => {    
+    
+    const updatedTimeTable = [...timeTable]
+
+    // Busco el día actual en la tabla
+    const exist = updatedTimeTable.find((day) => day.day === currentWeek[index])           
+
+    const finalMinutes = convertTimetoMinutes(exist.deliveryTime)
+    const initialMinutes = convertTimetoMinutes(exist.pickUpTime)    
+
+    if (finalMinutes <= initialMinutes) {
+      alert('La hora de entrega no puede ser igual o menor a la de recogida')
+      
+      console.log('Entro en el if');
+      
+      exist.deliveryTime = "00:00"
+      console.log('exist.deliveryTime > ', exist.deliveryTime);
+      
+
+      setTimeTable(updatedTimeTable)
+      
+    }   
+  
+  }
 
 
 
@@ -198,7 +221,10 @@ const TrackerTable = () => {
                     <td>
                       <input type='time' 
                         className='border w-full'
-                        onChange={(e) => setDeliveryTime(e, index)}/>                        
+                        onChange={(e) => setDeliveryTime(e, index)}
+                        onBlur={(e) => onBlurDeliveryTime(e, index)}
+                        value={timeTable[index]?.deliveryTime || "00:00"}
+                        />                        
                     </td>
                     <td>  {day.totalHours} </td>
                       
