@@ -18,6 +18,9 @@ const TrackerTable = () => {
 
 
   const setPickUpTime = (e, index) => {    
+
+    
+    
     
     const updatedTimeTable = [...timeTable]
     
@@ -34,35 +37,35 @@ const TrackerTable = () => {
         }
   
       }
+      else {
+        setTimeTable(updatedTimeTable)
+      }
 
   }
 
   const setDeliveryTime = (e, index) => {    
 
-    console.log('>> setDeliveryTime')
-
     // Se crea una copia del array de timeTable
-    const updatedTimeTable = [...timeTable]
-    
+    const updatedTimeTable = [...timeTable]    
     const exist = updatedTimeTable.find((day) => day.day === currentWeek[index])              
     
-    exist.deliveryTime = e.target.value      
-
-    console.log('exist.pickUpTime > ', exist.pickUpTime)
-    console.log('exist.deliveryTime > ', exist.deliveryTime)
+    exist.deliveryTime = e.target.value     
 
     if (exist.pickUpTime > "00:00" && exist.deliveryTime > "00:00") {        
+      
       const totalhours = calculateDuration(exist.pickUpTime, exist.deliveryTime)
       
       // Si la diferencia de horas es mayor a 0, se actualiza la tabla
-      if (totalhours > 0) {
-        exist.totalHours = totalhours
-        setTimeTable(updatedTimeTable)
+      if (totalhours > "00:00") {
+        exist.totalHours = totalhours        
       }
-               
-      console.log('timetable actualizado: ', timeTable);
       
-    }
+      setTimeTable(updatedTimeTable)
+      
+               
+      
+    } 
+    
   }
 
   
@@ -83,6 +86,7 @@ const TrackerTable = () => {
       console.log('Entro en el if');
       
       exist.deliveryTime = "00:00"
+      exist.totalHours = "00:00"
       console.log('exist.deliveryTime > ', exist.deliveryTime);
       
 
@@ -92,14 +96,27 @@ const TrackerTable = () => {
   
   }
 
+  const clearInput = (index, property) => {
+
+    console.log('clearInput > ', index, property);
+    
+
+    const updateTimeTable = [...timeTable]
+    updateTimeTable[index][property] = "00:00"    
+
+    
+    
+
+    setTimeTable(updateTimeTable)
+
+  }
+
 
 
   const getData = (date) => {
     
     const currentWeek = getCurrentWeek(date)
 
-    console.log('>> currentWeek', currentWeek);
-    
     
     // Cargo la tabla solo la primera vez
     if (timeTable.length == 0) {
@@ -108,19 +125,10 @@ const TrackerTable = () => {
       for (let i = 0; i < currentWeek.length; i++) {
         newTimeTable.push({day: currentWeek[i], pickupTime: "00:00", deliveryTime: "00:00", totalHours: 0})
       }
-      console.log('>> newTimeTable', newTimeTable);
-      setTimeTable(newTimeTable)
-      
+      setTimeTable(newTimeTable)      
       
     }
 
-    
-    
-    
-
-    
-    
-    
     return currentWeek
   }
 
@@ -204,40 +212,66 @@ const TrackerTable = () => {
 
       <div>
         <table className='w-full mt-3 border-collapse border'> 
+        <thead>
           <tr>
               <th>  Date </th>
               <th>  Pick-up Time	 </th>
               <th>  Delivery Time		 </th>
               <th>  Total Hours		 </th>              
           </tr>
-            
-
+          </thead>  
+          <tbody>
             {
               timeTable.map((day, index) => {
                 return (
                   <tr>
                     <td key={index}> {daysOfWeek[day.day.getDay()]} , {day.day.getDate()} de {months[day.day.getMonth()]} </td>
-                    <td>
-                      <input type='time' 
-                        className='border w-full'
-                        onChange={(e) => setPickUpTime(e, index)}/>
+                    {/* Hora de regcogida */}
+                    <td className="border border-gray-300 p-2">
+                      <div className='flex items-center'>
+                        <input type='time' 
+                          className='border w-full'
+                          onChange={(e) => setPickUpTime(e, index)}
+                          value={timeTable[index]?.pickUpTime || "00:00"}
+                        />
+                        <button className='ml-2 text-red-500 hover:text-red-700'
+                          onClick={() => clearInput(index, 'pickUpTime')}
+                        >
+                          <FaTimes/>
+                        </button>
+                      </div>
                     </td>
-                    <td>
+                    
+                    {/* Hora de entrega */}
+                    <td className="border border-gray-300 p-2">
+                    <div className='flex items-center'>
                       <input type='time' 
                         className='border w-full'
                         onChange={(e) => setDeliveryTime(e, index)}
                         onBlur={(e) => onBlurDeliveryTime(e, index)}
                         value={timeTable[index]?.deliveryTime || "00:00"}
                         />                        
+                        <button className='ml-2 text-red-500 hover:text-red-700'
+                          onClick={() => clearInput(index, 'deliveryTime')}
+                        >
+                          <FaTimes/>
+                        </button>
+
+                      </div>
+                        
                     </td>
+
+
+                    
                     <td>  {day.totalHours} </td>
                       
                   </tr>
 
                 )
               })
+
             }
-         
+         </tbody>
         </table>
       </div>
 

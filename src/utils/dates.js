@@ -18,7 +18,7 @@ export const getFirstDayOfWeek = (currentDate) => {
 // Crear toda la emana a partir del lunes
 export const getCurrentWeek = (date) => {
     
-    console.log('>> getCurrentWeek ')
+    
 
     const firtsDay = getFirstDayOfWeek(date)
     const curretWeek = []
@@ -52,14 +52,9 @@ export const convertMinutestoTime = (totalminutes) => {
   // Calcular la duración restantando la hora de fin de la de inicio
 export const calculateDuration = (start, end) => {
     const startMinutes = convertTimetoMinutes(start);
-    const endMinutes = convertTimetoMinutes(end);
-  
-    console.log("startMinutes :", startMinutes);
-    console.log("endMinutes :", endMinutes);
-  
-    const totalMinutes = endMinutes - startMinutes;
-  
-    console.log("totalMinutes: ", totalMinutes);
+    const endMinutes = convertTimetoMinutes(end);  
+      
+    const totalMinutes = endMinutes - startMinutes;    
   
     return convertMinutestoTime(totalMinutes);
   };
