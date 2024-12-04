@@ -10,7 +10,7 @@ const TrackerTable = () => {
   const [timeTable, setTimeTable] = useState([])
 
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
-
+  const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
   const getCurrentDate = () => { 
     return new Date()     
     
@@ -26,16 +26,15 @@ const TrackerTable = () => {
       
     if (currentEntry.pickUpTime > "00:00" && currentEntry.deliveryTime > "00:00") {       
         
-        const totalhours = calculateDuration(currentEntry.pickUpTime, currentEntry.deliveryTime)        
-        currentEntry.totalHours = totalhours        
-        setTimeTable(updatedTimeTable)
+        const totalhours = calculateDuration(currentEntry.pickUpTime, currentEntry.deliveryTime) 
+        
+        if (totalhours > 0) {
+          currentEntry.totalHours = totalhours
+          setTimeTable(updatedTimeTable)
+        }
+  
       }
 
-
-   
-
-    
-  
   }
 
   const setDeliveryTime = (e, index) => {    
@@ -54,8 +53,13 @@ const TrackerTable = () => {
 
     if (exist.pickUpTime > "00:00" && exist.deliveryTime > "00:00") {        
       const totalhours = calculateDuration(exist.pickUpTime, exist.deliveryTime)
-      exist.totalHours = totalhours
-      setTimeTable(updatedTimeTable)         
+      
+      // Si la diferencia de horas es mayor a 0, se actualiza la tabla
+      if (totalhours > 0) {
+        exist.totalHours = totalhours
+        setTimeTable(updatedTimeTable)
+      }
+               
       console.log('timetable actualizado: ', timeTable);
       
     }
@@ -212,7 +216,7 @@ const TrackerTable = () => {
               timeTable.map((day, index) => {
                 return (
                   <tr>
-                    <td key={index}> {daysOfWeek[day.day.getDay()]} , {new Date(day.day).toLocaleDateString()} </td>
+                    <td key={index}> {daysOfWeek[day.day.getDay()]} , {day.day.getDate()} de {months[day.day.getMonth()]} </td>
                     <td>
                       <input type='time' 
                         className='border w-full'
