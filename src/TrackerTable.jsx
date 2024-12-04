@@ -12,6 +12,7 @@ const TrackerTable = () => {
   const [timeTable, setTimeTable] = useState([])
   const [hoursPerWeek, setHoursPerWeek] = useState(0)
 
+
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
   const getCurrentDate = () => { 
@@ -38,8 +39,8 @@ const TrackerTable = () => {
       
     if (currentEntry.pickUpTime > "00:00" && currentEntry.deliveryTime > "00:00") {    
       
-      console.log('currentEntry.pickUpTime ', currentEntry.pickUpTime);
-      console.log('currentEntry.deliveryTime ', currentEntry.deliveryTime);
+      
+      
       
         
         const totalhours = calculateDuration(currentEntry.pickUpTime, currentEntry.deliveryTime) 
@@ -51,7 +52,7 @@ const TrackerTable = () => {
           currentEntry.totalHours = totalhours          
         }
         setTimeTable(updatedTimeTable)
-        console.log('updatedTimeTable > ', updatedTimeTable);
+        
         
   
       }
@@ -101,11 +102,11 @@ const TrackerTable = () => {
     if (finalMinutes <= initialMinutes) {
       alert('La hora de entrega no puede ser igual o menor a la de recogida')
       
-      console.log('Entro en el if');
+      
       
       exist.deliveryTime = "00:00"
       exist.totalHours = "00:00"
-      console.log('exist.deliveryTime > ', exist.deliveryTime);
+      
       
 
       setTimeTable(updatedTimeTable)
@@ -150,7 +151,7 @@ const TrackerTable = () => {
   // Actualiza los días de la semana a partir de la nueva fecha
   const loadWeek = (currentWeek) => {    
       
-      const newTimeTable = []
+      const newTimeTable = [...timeTable]
       
       for (let i = 0; i < currentWeek.length; i++) {
         newTimeTable.push({day: currentWeek[i], pickupTime: "00:00", deliveryTime: "00:00", totalHours: "00:00"})
@@ -195,7 +196,7 @@ const TrackerTable = () => {
     
     // Recarga la semana a partir de la nueva fecha
     const currentWeek = getData(prevWeekDate)
-    console.log('>>>> currentWeek', currentWeek);
+    
     
 
     setCurrentWeek(currentWeek)
@@ -208,7 +209,7 @@ const TrackerTable = () => {
     const nextWeekDate = new Date(date);
     const days = 7
     nextWeekDate.setDate(nextWeekDate.getDate() + days)
-    console.log('>> nextWeekDate', nextWeekDate)
+    
 
     const stringDate = nextWeekDate.toISOString().slice(0, 10)
     setDate(stringDate)
@@ -269,6 +270,15 @@ const TrackerTable = () => {
           <tbody>
             {
               timeTable.map((day, index) => {
+
+                const exitDay = currentWeek.find((currentWeekDay) => currentWeekDay === day.day)
+                console.log();  
+                
+                // Solo se muestran los días de la semana actual, no todo. 
+                if (!exitDay) {                
+                  return 
+                }                
+
                 return (
                   <tr>
                     <td key={index}> {daysOfWeek[day.day.getDay()]} , {day.day.getDate()} de {months[day.day.getMonth()]} </td>
