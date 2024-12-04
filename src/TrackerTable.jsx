@@ -19,6 +19,7 @@ const TrackerTable = () => {
 
   const setPickUpTime = (e, index) => {    
 
+    console.log('> setPickUpTime');
     
     
     
@@ -26,15 +27,26 @@ const TrackerTable = () => {
     
     const currentEntry = updatedTimeTable.find((day) => day.day === currentWeek[index])
     currentEntry.pickUpTime = e.target.value
+
+
       
-    if (currentEntry.pickUpTime > "00:00" && currentEntry.deliveryTime > "00:00") {       
+    if (currentEntry.pickUpTime > "00:00" && currentEntry.deliveryTime > "00:00") {    
+      
+      console.log('currentEntry.pickUpTime ', currentEntry.pickUpTime);
+      console.log('currentEntry.deliveryTime ', currentEntry.deliveryTime);
+      
         
         const totalhours = calculateDuration(currentEntry.pickUpTime, currentEntry.deliveryTime) 
+
+        console.log('totalhours > ', totalhours);
         
-        if (totalhours > 0) {
-          currentEntry.totalHours = totalhours
-          setTimeTable(updatedTimeTable)
+        
+        if (totalhours > "00:00") {
+          currentEntry.totalHours = totalhours          
         }
+        setTimeTable(updatedTimeTable)
+        console.log('updatedTimeTable > ', updatedTimeTable);
+        
   
       }
       else {
@@ -96,19 +108,15 @@ const TrackerTable = () => {
   
   }
 
-  const clearInput = (index, property) => {
-
-    console.log('clearInput > ', index, property);
-    
+  const clearInput = (index, property) => {        
 
     const updateTimeTable = [...timeTable]
-    updateTimeTable[index][property] = "00:00"    
-
+    updateTimeTable[index][property] = "00:00"        
     
+    // Si se borra alguna hora, se pone a cero el total de horas  
+    updateTimeTable[index].totalHours = "00:00"
     
-
     setTimeTable(updateTimeTable)
-
   }
 
 
