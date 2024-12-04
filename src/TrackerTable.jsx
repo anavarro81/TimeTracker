@@ -1,13 +1,16 @@
 
 import React, {useEffect, useState, useRef} from 'react'
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
-import {calculateDuration, getCurrentWeek, convertTimetoMinutes} from './utils/dates'
+import {calculateDuration, getCurrentWeek, convertTimetoMinutes, convertMinutestoTime} from './utils/dates'
+
+
 
 const TrackerTable = () => {
   
   const [date, setDate] = useState('')
   const [currentWeek, setCurrentWeek] = useState([])
   const [timeTable, setTimeTable] = useState([])
+  const [hoursPerWeek, setHoursPerWeek] = useState(0)
 
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -15,6 +18,11 @@ const TrackerTable = () => {
     return new Date()     
     
   } 
+
+  //
+  const totalHours = timeTable.map((day) => convertTimetoMinutes(day.totalHours))
+  
+  console.log('totalHours > ', totalHours);
 
 
   const setPickUpTime = (e, index) => {    
@@ -131,7 +139,7 @@ const TrackerTable = () => {
       const newTimeTable = [...timeTable]
     
       for (let i = 0; i < currentWeek.length; i++) {
-        newTimeTable.push({day: currentWeek[i], pickupTime: "00:00", deliveryTime: "00:00", totalHours: 0})
+        newTimeTable.push({day: currentWeek[i], pickupTime: "00:00", deliveryTime: "00:00", totalHours: "00:00"})
       }
       setTimeTable(newTimeTable)      
       
@@ -159,7 +167,12 @@ const TrackerTable = () => {
 
   }, []) 
 
+  useEffect(() => {
 
+     totalHours.reduce((acc, value) => acc + value, 0)
+     setHoursPerWeek(convertMinutestoTime(totalHours.reduce((acc, value) => acc + value, 0))) 
+
+  }, [totalHours])
 
 
   const getPrevoiusWeek = () => {
@@ -279,10 +292,14 @@ const TrackerTable = () => {
               })
 
             }
+            <tr> 
+              <td colSpan="3" className='text-right pr-2'> Total horas semana:  </td>
+              <td className='text-right pr-2'>  {hoursPerWeek} </td>
+            </tr>
          </tbody>
         </table>
       </div>
-
+              
 
             
 
