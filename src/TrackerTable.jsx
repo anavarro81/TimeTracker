@@ -22,12 +22,10 @@ const TrackerTable = () => {
   //
   const totalHours = timeTable.map((day) => convertTimetoMinutes(day.totalHours))
   
-  console.log('totalHours > ', totalHours);
-
-
+  
   const setPickUpTime = (e, index) => {    
 
-    console.log('> setPickUpTime');
+    
     
     
     
@@ -46,7 +44,7 @@ const TrackerTable = () => {
         
         const totalhours = calculateDuration(currentEntry.pickUpTime, currentEntry.deliveryTime) 
 
-        console.log('totalhours > ', totalhours);
+        
         
         
         if (totalhours > "00:00") {
@@ -148,11 +146,25 @@ const TrackerTable = () => {
     return currentWeek
   }
 
+
+  // Actualiza los días de la semana a partir de la nueva fecha
+  const loadWeek = (currentWeek) => {    
+      
+      const newTimeTable = []
+      
+      for (let i = 0; i < currentWeek.length; i++) {
+        newTimeTable.push({day: currentWeek[i], pickupTime: "00:00", deliveryTime: "00:00", totalHours: "00:00"})
+      }
+      setTimeTable(newTimeTable)      
+      
+    
+  }
+
   useEffect(() => {
     // Obtener la fecha actual, solo los primeros 10 caracteres
     const date = getCurrentDate()    
     
-    // Estabñecer la fecha en el encabezado
+    // Establecer la fecha en el encabezado
     const stringDate = getCurrentDate().toISOString().slice(0, 10)
     setDate(stringDate)
 
@@ -161,18 +173,14 @@ const TrackerTable = () => {
       const currentWeek = getData(date)  
       setCurrentWeek(currentWeek)
     }
-    
-    
-  
-
   }, []) 
 
+  // Cada vez que cambia el numero total de horas, se actualiza el total de horas por semana
   useEffect(() => {
-
      totalHours.reduce((acc, value) => acc + value, 0)
      setHoursPerWeek(convertMinutestoTime(totalHours.reduce((acc, value) => acc + value, 0))) 
-
   }, [totalHours])
+
 
 
   const getPrevoiusWeek = () => {
@@ -180,10 +188,18 @@ const TrackerTable = () => {
     const prevWeekDate = new Date(date);
     const days = 7
     prevWeekDate.setDate(prevWeekDate.getDate() - days)
-    console.log('>> prevWeekDate', prevWeekDate)
+    
 
     const stringDate = prevWeekDate.toISOString().slice(0, 10)
     setDate(stringDate)
+    
+    // Recarga la semana a partir de la nueva fecha
+    const currentWeek = getData(prevWeekDate)
+    console.log('>>>> currentWeek', currentWeek);
+    
+
+    setCurrentWeek(currentWeek)
+    loadWeek(currentWeek)
 
   }
 
@@ -196,6 +212,15 @@ const TrackerTable = () => {
 
     const stringDate = nextWeekDate.toISOString().slice(0, 10)
     setDate(stringDate)
+
+    // Recarga la semana a partir de la nueva fecha
+    const currentWeek = getData(nextWeekDate)
+    console.log('>>>> currentWeek', currentWeek);
+    
+
+    setCurrentWeek(currentWeek)
+    loadWeek(currentWeek)
+    
 
   }
 
