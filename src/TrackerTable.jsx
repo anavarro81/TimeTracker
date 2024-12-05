@@ -1,13 +1,15 @@
 
+
 import React, {useEffect, useState, useRef} from 'react'
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
-import {calculateDuration, getCurrentWeek, convertTimetoMinutes, convertMinutestoTime} from './utils/dates'
+import {calculateDuration, getCurrentWeek, convertTimetoMinutes, convertMinutestoTime, getFirstDayOfWeek} from './utils/dates'
 
 
 
 const TrackerTable = () => {
   
-  const [date, setDate] = useState('')
+  const [dateString, setDateString] = useState('')
+  const [date, setDate] = useState(new Date())  
   const [currentWeek, setCurrentWeek] = useState([])
   const [timeTable, setTimeTable] = useState([])
   const [hoursPerWeek, setHoursPerWeek] = useState(0)
@@ -15,6 +17,7 @@ const TrackerTable = () => {
 
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  
   const getCurrentDate = () => { 
     return new Date()     
     
@@ -163,11 +166,17 @@ const TrackerTable = () => {
 
   useEffect(() => {
     // Obtener la fecha actual, solo los primeros 10 caracteres
-    const date = getCurrentDate()    
+    const date = getCurrentDate()
+    
+    // Obtener el primer día de la semana
+    const firstDay = getFirstDayOfWeek(date)
+    
+    
+    const dateWeek = `${firstDay.getDate()} de ${months[firstDay.getMonth()]}`
     
     // Establecer la fecha en el encabezado
     const stringDate = getCurrentDate().toISOString().slice(0, 10)
-    setDate(stringDate)
+    setDateString(dateWeek)
 
     // Solo se carga una vez la tabla
     if (timeTable.length == 0) {
@@ -186,18 +195,22 @@ const TrackerTable = () => {
 
   const getPrevoiusWeek = () => {
     
+    
+    // Obtener la fecha de la semana anterior. Establecer la fecha en el estado
     const prevWeekDate = new Date(date);
     const days = 7
-    prevWeekDate.setDate(prevWeekDate.getDate() - days)
-    
+    prevWeekDate.setDate(prevWeekDate.getDate() - days)  
+    setDate(prevWeekDate)    
 
-    const stringDate = prevWeekDate.toISOString().slice(0, 10)
-    setDate(stringDate)
+    // Obtiene el lunes de la semana anterior. 
+    // Lo formatea para mostrarlo como dia del mes y mes
+    // Actualiza el estado con la nueva fecha
+    const firstDay = getFirstDayOfWeek(prevWeekDate)   
+    const dateWeek = `${firstDay.getDate()} de ${months[firstDay.getMonth()]}`
+    setDateString(dateWeek)
     
     // Recarga la semana a partir de la nueva fecha
-    const currentWeek = getData(prevWeekDate)
-    
-    
+    const currentWeek = getData(prevWeekDate)       
 
     setCurrentWeek(currentWeek)
     loadWeek(currentWeek)
@@ -209,14 +222,21 @@ const TrackerTable = () => {
     const nextWeekDate = new Date(date);
     const days = 7
     nextWeekDate.setDate(nextWeekDate.getDate() + days)
-    
+    setDate(nextWeekDate)
 
-    const stringDate = nextWeekDate.toISOString().slice(0, 10)
-    setDate(stringDate)
+    // Obtiene el lunes de la semana anterior. 
+    // Lo formatea para mostrarlo como dia del mes y mes
+    // Actualiza el estado con la nueva fecha
+
+    const firstDay = getFirstDayOfWeek(prevWeekDate)   
+    const dateWeek = `${firstDay.getDate()} de ${months[firstDay.getMonth()]}`
+    setDateString(dateWeek)
+
+
 
     // Recarga la semana a partir de la nueva fecha
     const currentWeek = getData(nextWeekDate)
-    console.log('>>>> currentWeek', currentWeek);
+    
     
 
     setCurrentWeek(currentWeek)
@@ -243,7 +263,7 @@ const TrackerTable = () => {
                 </button>
             </div>
             
-            <div> Semana del {date} </div>
+            <div> Semana del {dateString} </div>
             
             <div>
              
@@ -272,7 +292,7 @@ const TrackerTable = () => {
               timeTable.map((day, index) => {
 
                 const exitDay = currentWeek.find((currentWeekDay) => currentWeekDay === day.day)
-                console.log();  
+                  
                 
                 // Solo se muestran los días de la semana actual, no todo. 
                 if (!exitDay) {                
