@@ -27,15 +27,19 @@ const TrackerTable = () => {
   const totalHours = timeTable.map((day) => convertTimetoMinutes(day.totalHours))
   
   
-  const setPickUpTime = (e, index) => {    
+  const setPickUpTime = (e, dayOfWeek) => {    
+
+    
+    const updatedTimeTable = [...timeTable]
 
     
     
     
     
-    const updatedTimeTable = [...timeTable]
+    const currentEntry = updatedTimeTable.find((day) => day.day === dayOfWeek)
     
-    const currentEntry = updatedTimeTable.find((day) => day.day === currentWeek[index])
+    
+    
     currentEntry.pickUpTime = e.target.value
 
 
@@ -65,11 +69,11 @@ const TrackerTable = () => {
 
   }
 
-  const setDeliveryTime = (e, index) => {    
+  const setDeliveryTime = (e, dayOfWeek) => {    
 
     // Se crea una copia del array de timeTable
     const updatedTimeTable = [...timeTable]    
-    const exist = updatedTimeTable.find((day) => day.day === currentWeek[index])              
+    const exist = updatedTimeTable.find((day) => day.day === dayOfWeek)              
     
     exist.deliveryTime = e.target.value     
 
@@ -92,12 +96,12 @@ const TrackerTable = () => {
 
   
   // Valida que la hora de entrega no sea menor a la de recogida
-  const onBlurDeliveryTime = (e, index) => {    
+  const onBlurDeliveryTime = (e, dayOfWeek) => {    
     
     const updatedTimeTable = [...timeTable]
 
     // Busco el día actual en la tabla
-    const exist = updatedTimeTable.find((day) => day.day === currentWeek[index])           
+    const exist = updatedTimeTable.find((day) => day.day === dayOfWeek)           
 
     const finalMinutes = convertTimetoMinutes(exist.deliveryTime)
     const initialMinutes = convertTimetoMinutes(exist.pickUpTime)    
@@ -168,21 +172,15 @@ const TrackerTable = () => {
     // Obtener la fecha actual, solo los primeros 10 caracteres
     const date = getCurrentDate()
     
-    // Obtener el primer día de la semana
+    // Obtener el primer día de la semana y lo formatea para mostrarlo como dia del mes y mes
+    // Muestra la fecha en el header <h2>
     const firstDay = getFirstDayOfWeek(date)
-    
-    
     const dateWeek = `${firstDay.getDate()} de ${months[firstDay.getMonth()]}`
+    setDateString(dateWeek)    
     
-    // Establecer la fecha en el encabezado
-    const stringDate = getCurrentDate().toISOString().slice(0, 10)
-    setDateString(dateWeek)
-
-    // Solo se carga una vez la tabla
-    if (timeTable.length == 0) {
-      const currentWeek = getData(date)  
-      setCurrentWeek(currentWeek)
-    }
+    const currentWeek = getData(date)  
+    setCurrentWeek(currentWeek)
+    
   }, []) 
 
   // Cada vez que cambia el numero total de horas, se actualiza el total de horas por semana
@@ -213,12 +211,33 @@ const TrackerTable = () => {
     const currentWeek = getData(prevWeekDate)       
 
     setCurrentWeek(currentWeek)
-    loadWeek(currentWeek)
+
+    
+
+
+
+    const existDay = timeTable.find((day) => {
+      
+      return new Date(day.day).toISOString().slice(0,10) === new Date(firstDay).toISOString().slice(0, 10);
+    }); 
+
+    
+    
+    if (!existDay) {
+      
+      loadWeek(currentWeek)
+    } else {
+      const newTimeTable = [...timeTable]
+      setTimeTable(newTimeTable)
+    }
+
+
 
   }
 
   const getNextWeek = () => {
     
+    // Le suma 7 días a la fecha actual. Establece la fecha en el estado
     const nextWeekDate = new Date(date);
     const days = 7
     nextWeekDate.setDate(nextWeekDate.getDate() + days)
@@ -227,8 +246,7 @@ const TrackerTable = () => {
     // Obtiene el lunes de la semana anterior. 
     // Lo formatea para mostrarlo como dia del mes y mes
     // Actualiza el estado con la nueva fecha
-
-    const firstDay = getFirstDayOfWeek(prevWeekDate)   
+    const firstDay = getFirstDayOfWeek(nextWeekDate)   
     const dateWeek = `${firstDay.getDate()} de ${months[firstDay.getMonth()]}`
     setDateString(dateWeek)
 
@@ -240,7 +258,23 @@ const TrackerTable = () => {
     
 
     setCurrentWeek(currentWeek)
-    loadWeek(currentWeek)
+
+
+    const existDay = timeTable.find((day) => {
+      
+      return new Date(day.day).toISOString().slice(0,10) === new Date(firstDay).toISOString().slice(0, 10);
+    });   
+    
+    
+    console.log('>> existDay', existDay);
+    
+    if (!existDay) {
+      
+      loadWeek(currentWeek)
+    } else {
+      const newTimeTable = [...timeTable]
+      setTimeTable(newTimeTable)
+    }
     
 
   }
@@ -253,61 +287,70 @@ const TrackerTable = () => {
     
     
     <div className='container mx-auto p-4'>
-        <div className='flex justify-between'>
-            
-            <div>
+        <div className='mb-4 flex justify-between items-center'>                       
                 <button
                     onClick={getPrevoiusWeek} 
-                    className='bg-blue-500 hover:bg-blue-700 font-bold text-white py-2 px-4 rounded'>
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    aria-label="Previous Week"
+                    >
                     <FaChevronLeft/>
-                </button>
-            </div>
+                </button>           
             
-            <div> Semana del {dateString} </div>
-            
-            <div>
-             
+            <h2 className="text-2xl font-bold"> 
+              Semana del {dateString} 
+            </h2>
                 <button 
                   onClick={getNextWeek}
-                  className='bg-blue-500 hover:bg-blue-700 font-bold text-white py-2 px-4 rounded'>
+                  className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+                  aria-label="Next Week">
                     <FaChevronRight/>
                 </button>
-            </div>
+            
 
         </div>
 {/* Tabla de horarios */}
 
-      <div>
-        <table className='w-full mt-3 border-collapse border'> 
+      <div className="overflow-x-auto">
+        <table className='w-full border-collapse border border-gray-300'> 
         <thead>
-          <tr>
-              <th>  Date </th>
-              <th>  Pick-up Time	 </th>
-              <th>  Delivery Time		 </th>
-              <th>  Total Hours		 </th>              
+          <tr className='bg-gray-100'>
+              <th className="border border-gray-300 p-2">  Fecha </th>
+              <th className="border border-gray-300 p-2">  Hora de recogida	 </th>
+              <th className="border border-gray-300 p-2">  Hora de entrega		 </th>
+              <th className="border border-gray-300 p-2">  Total horas		 </th>              
           </tr>
           </thead>  
           <tbody>
             {
               timeTable.map((day, index) => {
 
-                const exitDay = currentWeek.find((currentWeekDay) => currentWeekDay === day.day)
-                  
+                // const exitDay = currentWeek.find((currentWeekDay) => currentWeekDay === day.day)
+
+                const existDay = currentWeek.find((currentWeekDay) => {      
+                  return new Date(day.day).toISOString().slice(0,10) === new Date(currentWeekDay).toISOString().slice(0, 10);
+                }); 
+            
                 
-                // Solo se muestran los días de la semana actual, no todo. 
-                if (!exitDay) {                
+                
+                
+                //Solo se muestran los días de la semana actual, no todo. 
+                if (!existDay) {                
                   return 
                 }                
 
                 return (
-                  <tr>
-                    <td key={index}> {daysOfWeek[day.day.getDay()]} , {day.day.getDate()} de {months[day.day.getMonth()]} </td>
+                  <tr className="hover:bg-gray-50">
+                    <td 
+                      className="border border-gray-300 p-2"
+                      key={index}> {daysOfWeek[day.day.getDay()]} , {day.day.getDate()} de {months[day.day.getMonth()]} 
+                      
+                    </td>
                     {/* Hora de regcogida */}
                     <td className="border border-gray-300 p-2">
                       <div className='flex items-center'>
                         <input type='time' 
                           className='border w-full'
-                          onChange={(e) => setPickUpTime(e, index)}
+                          onChange={(e) => setPickUpTime(e, day.day)}
                           value={timeTable[index]?.pickUpTime || "00:00"}
                         />
                         <button className='ml-2 text-red-500 hover:text-red-700'
@@ -323,8 +366,8 @@ const TrackerTable = () => {
                     <div className='flex items-center'>
                       <input type='time' 
                         className='border w-full'
-                        onChange={(e) => setDeliveryTime(e, index)}
-                        onBlur={(e) => onBlurDeliveryTime(e, index)}
+                        onChange={(e) => setDeliveryTime(e, day.day)}
+                        onBlur={(e) => onBlurDeliveryTime(e, day.day)}
                         value={timeTable[index]?.deliveryTime || "00:00"}
                         />                        
                         <button className='ml-2 text-red-500 hover:text-red-700'
@@ -339,7 +382,7 @@ const TrackerTable = () => {
 
 
                     
-                    <td>  {day.totalHours} </td>
+                    <td className="border border-gray-300 p-2 text-right">  {day.totalHours} </td>
                       
                   </tr>
 
@@ -347,11 +390,14 @@ const TrackerTable = () => {
               })
 
             }
-            <tr> 
-              <td colSpan="3" className='text-right pr-2'> Total horas semana:  </td>
+            </tbody>
+            <tfoot> 
+            <tr className='bg-gray-200 font-blod'> 
+              <td colSpan="3" className='border border-gray-300 p-2 text-right'> Total horas semana:  </td>
               <td className='text-right pr-2'>  {hoursPerWeek} </td>
             </tr>
-         </tbody>
+            </tfoot>
+         
         </table>
       </div>
               

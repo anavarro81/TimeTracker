@@ -19,11 +19,11 @@ export const getFirstDayOfWeek = (currentDate) => {
 export const getCurrentWeek = (date) => {
     
     
-    console.log('>> getCurrentWeek > date', date)
+    
 
     const firtsDay = getFirstDayOfWeek(date)
 
-    console.log('>> firtsDay : ', firtsDay)
+    
 
     const curretWeek = []
     curretWeek.push(firtsDay)
@@ -36,7 +36,7 @@ export const getCurrentWeek = (date) => {
         curretWeek.push(dayofWeek)        
     }
 
-    console.log('>> curretWeek : ', curretWeek)
+    
     
     return curretWeek  
 }
