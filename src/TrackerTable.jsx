@@ -24,8 +24,19 @@ const TrackerTable = () => {
   } 
 
   //
-  const totalHours = timeTable.map((day) => convertTimetoMinutes(day.totalHours))
+  const totalHours = timeTable.map((day) => 
+    {  
+      return (
+        {
+        day: day.day,
+        totalhours: convertTimetoMinutes(day.totalHours)
+        }
+      )
+    } 
+  )
   
+  
+
   
   const setPickUpTime = (e, dayOfWeek) => {    
 
@@ -183,12 +194,40 @@ const TrackerTable = () => {
     
   }, []) 
 
+  //TODO: Calcular el total de horas por semana
   // Cada vez que cambia el numero total de horas, se actualiza el total de horas por semana
-  useEffect(() => {
-     totalHours.reduce((acc, value) => acc + value, 0)
-     setHoursPerWeek(convertMinutestoTime(totalHours.reduce((acc, value) => acc + value, 0))) 
-  }, [totalHours])
+  // useEffect(() => {
 
+  //    const currentWeekHours = totalHours.map((day) => 
+  //    {
+      
+  //       currentWeek.find((currentWeekDay) => new Date (currentWeekDay).toISOString.slice(0,10) === new Date(day.day).toISOString().slice(0, 10))
+      
+  //     return day.totalHours
+  //    })
+  //    // 
+
+  //   //  totalHours.reduce((acc, value) => acc + value, 0)   
+  //   //  setHoursPerWeek(convertMinutestoTime(totalHours.reduce((acc, value) => acc + value, 0))) 
+  // }, [totalHours])
+
+  useEffect(() => {
+
+    // Solo se suman las horas de la semana en curso, no todas. 
+    // Se filtran las horas de la semana actual. Hay que convertir a formato iso para comparar y quedarse con los 10 primeros caracteres (fecha)
+
+    const currentWeekHours = currentWeek.map((day) => {
+      const existInCurrentWeek = totalHours.find((totalHoursDay) => new Date(totalHoursDay.day).toISOString().slice(0,10) === new Date(day).toISOString().slice(0, 10))
+
+      if (existInCurrentWeek) {
+        return existInCurrentWeek.totalhours
+      }  
+    })
+
+    // Se usa un reduce para sumar las horas de la semana
+    setHoursPerWeek(convertMinutestoTime(currentWeekHours.reduce((acc, value) => acc + value, 0))) 
+  
+  }, [timeTable])
 
 
   const getPrevoiusWeek = () => {
@@ -266,7 +305,7 @@ const TrackerTable = () => {
     });   
     
     
-    console.log('>> existDay', existDay);
+    
     
     if (!existDay) {
       
